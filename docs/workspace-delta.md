@@ -26,6 +26,14 @@ The binding is single-use and deeply immutable. It creates no Loader row,
 prompt section, tool schema, durable context, session event, provider input, or
 credential access.
 
+WorkspaceDelta deliberately remains a **baseline -> final** promotable-content
+artifact. TaskCheck v1 permits authoritative commands to transform paths that
+are already covered by mutable authority before the post-command checked state
+reaches GREEN. WorkspaceDelta therefore does not prove which actor produced
+each promoted byte, and TaskCheck v1 does not claim verifier non-interference.
+See [task-check-authoritative-finalization.md](task-check-authoritative-finalization.md)
+for the provider-free characterization of that behavior.
+
 ## Promotable subset
 
 The first handoff deliberately supports ordinary single-link UTF-8 files with

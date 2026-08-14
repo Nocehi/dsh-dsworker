@@ -49,6 +49,21 @@ function contractInput(argv = ["--version"]) {
 
 const EMPTY_SHA = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 const SNAPSHOT_SHA = "0".repeat(64);
+const TASK_CHECK_RESULT_V1_PUBLIC_KEYS = Object.freeze([
+  "version",
+  "status",
+  "contract",
+  "contractSha256",
+  "workspaceIdentity",
+  "baseline",
+  "preCommands",
+  "postCommands",
+  "scope",
+  "immutable",
+  "commands",
+  "failures",
+  "greenPredicate",
+]);
 
 function snapshot(ok = true, code = "snapshot-complete") {
   return {
@@ -129,6 +144,7 @@ test("one pure predicate produces a genuine deeply immutable GREEN", () => {
   assert.equal(result.status, "green");
   assert.equal(result.contract, contract);
   assert.equal(result.contractSha256, contract.contractSha256);
+  assert.deepEqual(Object.keys(result), TASK_CHECK_RESULT_V1_PUBLIC_KEYS);
   assert.deepEqual(result.greenPredicate, {
     baselineValid: true,
     preCommandSnapshotValid: true,
