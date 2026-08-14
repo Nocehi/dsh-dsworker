@@ -1,0 +1,112 @@
+{
+  "authority": {
+    "version": "dsh-dsworker/task-contract/v1",
+    "taskId": "python-argv-lexer",
+    "objective": "Fix the bounded argv lexer so quoted spans and explicit empty arguments are preserved. Work only in lexer.py; test_lexer.py is immutable evaluation authority. Preserve the public parse_argv(line) function. Do not use shlex, subprocess, eval, a shell, whitespace split, or add features beyond double quotes and backslash escapes. Run the focused test. Do not commit, push, or perform GitHub operations.",
+    "workspace": {
+      "root": "runner-supplied",
+      "commandCwdPolicy": "workspace-relative-only",
+      "symlinkPolicy": "unsupported"
+    },
+    "paths": {
+      "mutable": [
+        {
+          "path": "lexer.py",
+          "kind": "file"
+        }
+      ],
+      "immutable": [
+        {
+          "path": "test_lexer.py",
+          "kind": "file",
+          "sha256": "1e731f05e4aa54af2b39e44d29395094eb8737d3a607b5d4563f1bc0bd64015d"
+        }
+      ]
+    },
+    "commands": {
+      "semantic": [
+        {
+          "id": "semantic-focused-test",
+          "executable": "python3",
+          "argv": [
+            "-m",
+            "unittest",
+            "-v",
+            "test_lexer.py"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "PYTHONDONTWRITEBYTECODE": "1"
+          },
+          "timeoutMs": 60000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        }
+      ],
+      "validation": [
+        {
+          "id": "validation-focused-test",
+          "executable": "python3",
+          "argv": [
+            "-m",
+            "unittest",
+            "-v",
+            "test_lexer.py"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "PYTHONDONTWRITEBYTECODE": "1"
+          },
+          "timeoutMs": 60000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        }
+      ],
+      "finish": [
+        {
+          "id": "finish-python-compile",
+          "executable": "python3",
+          "argv": [
+            "-c",
+            "from pathlib import Path; [compile(Path(p).read_text(encoding='utf-8'), p, 'exec') for p in ('lexer.py', 'test_lexer.py')]"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {},
+          "timeoutMs": 60000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        }
+      ]
+    },
+    "retry": {
+      "mode": "none",
+      "maxAttempts": 1
+    },
+    "terminal": {
+      "success": "all-authoritative-commands-pass",
+      "failure": "fail-closed"
+    }
+  },
+  "metadata": {
+    "donor": {
+      "source": "external-donor:ds-worker/evals/corpus.json",
+      "taskId": "python-argv-lexer"
+    },
+    "provenance": "Minimum semantics copied manually; no ds-worker runtime dependency."
+  }
+}

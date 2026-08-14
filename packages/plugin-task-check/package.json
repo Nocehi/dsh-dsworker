@@ -1,0 +1,26 @@
+{
+  "name": "@dsh-dsworker/plugin-task-check",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./summary": "./src/summary.js",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@dsh-dsworker/task-check-core": "file:../task-check-core",
+    "@dsh-dsworker/task-check-local": "file:../task-check-local",
+    "@dsh-dsworker/task-contract": "file:../task-contract"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-agent": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-llm": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.6"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

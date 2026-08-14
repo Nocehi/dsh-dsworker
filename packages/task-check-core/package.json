@@ -1,0 +1,18 @@
+{
+  "name": "@dsh-dsworker/task-check-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@dsh-dsworker/task-contract": "file:../task-contract"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

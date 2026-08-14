@@ -1,0 +1,30 @@
+{
+  "name": "@dsh-dsworker/worker-kernel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dsh-dsworker-run": "./bin/dsh-dsworker-run.js"
+  },
+  "dependencies": {
+    "@dsh-dsworker/execution-containment": "file:../execution-containment",
+    "@dsh-dsworker/plugin-task-check": "file:../plugin-task-check",
+    "@dsh-dsworker/task-check-local": "file:../task-check-local",
+    "@dsh-dsworker/task-contract": "file:../task-contract",
+    "@dsh-dsworker/workspace-delta": "file:../workspace-delta"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-agent": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-app-boot": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-llm": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-session": "0.1.0-rc.6"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,97 @@
+exports[`real rc.6 GREEN commits, concludes the turn, and denies later same-batch tools 1`] = `
+{
+  "version": "dsh-dsworker/task-check-tool-result/v1",
+  "status": "green",
+  "contractSha256": "0a2105c759dd690ac86403838029a75f848f71410bafe5e8cbf7930da7e835b6",
+  "workspaceIdentity": "<WORKSPACE_IDENTITY>",
+  "greenPredicate": {
+    "baselineValid": true,
+    "preCommandSnapshotValid": true,
+    "postCommandSnapshotValid": true,
+    "scopeValid": true,
+    "immutableValid": true,
+    "allCommandsPresent": true,
+    "commandsPass": true,
+    "notAborted": true,
+    "infrastructureIntact": true
+  },
+  "snapshots": {
+    "baseline": {
+      "ok": true,
+      "code": "snapshot-complete"
+    },
+    "preCommands": {
+      "ok": true,
+      "code": "snapshot-complete"
+    },
+    "postCommands": {
+      "ok": true,
+      "code": "snapshot-complete"
+    }
+  },
+  "scope": {
+    "ok": true,
+    "preCommandsOk": true,
+    "postCommandsOk": true,
+    "preChangedPathCount": 1,
+    "postChangedPathCount": 1,
+    "preChangedPaths": [
+      "lexer.py"
+    ],
+    "postChangedPaths": [
+      "lexer.py"
+    ],
+    "preChangedPathsOmitted": 0,
+    "postChangedPathsOmitted": 0
+  },
+  "immutable": {
+    "ok": true,
+    "baselineOk": true,
+    "preCommandsOk": true,
+    "postCommandsOk": true,
+    "findingCount": 0
+  },
+  "commands": {
+    "total": 3,
+    "passed": 3,
+    "items": [
+      {
+        "phase": "semantic",
+        "commandId": "semantic-focused-test",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "aborted": false,
+        "failureCode": null
+      },
+      {
+        "phase": "validation",
+        "commandId": "validation-focused-test",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "aborted": false,
+        "failureCode": null
+      },
+      {
+        "phase": "finish",
+        "commandId": "finish-python-compile",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "aborted": false,
+        "failureCode": null
+      }
+    ],
+    "omitted": 0
+  },
+  "failures": {
+    "total": 0,
+    "items": [],
+    "omitted": 0
+  }
+}
+`;

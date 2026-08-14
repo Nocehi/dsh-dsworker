@@ -1,0 +1,35 @@
+{
+  "composedConfigBytes": 12625,
+  "composedConfigSha256": "b2f75330b480f70a5b9a8b195b5211fe69fc0129b531cfe73f75d6dedbfaaeca",
+  "dshVersion": "0.1.0-rc.6",
+  "durableInitialContextBytes": 0,
+  "durableInitialContextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "pathGuardGeometryDelta": {
+    "durableContextBytes": 0,
+    "systemBytes": 0,
+    "toolSchemaBytes": 0
+  },
+  "presetId": "lean-coding",
+  "systemBytes": 1544,
+  "systemSha256": "a9f1dd473d1921667863cd1a7ad3f59ef11d9b9f3123063da426d9ec1014a7e0",
+  "taskCheckPluginUnboundGeometryDelta": {
+    "durableContextBytes": 0,
+    "systemBytes": 0,
+    "toolSchemaBytes": 0
+  },
+  "toolNames": [
+    "bash",
+    "edit",
+    "glob",
+    "grep",
+    "read",
+    "write"
+  ],
+  "toolSchemaBytes": 7005,
+  "toolsSha256": "47b9fb3496df75b32e656f1e8e67198b6ea9a2fe2f28c68ca9381483c4143856",
+  "traceGeometryDelta": {
+    "durableContextBytes": 0,
+    "systemBytes": 0,
+    "toolSchemaBytes": 0
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@dsh-dsworker/execution-containment",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-subprocess-local": "0.1.0-rc.6",
+    "@dsh-dsworker/task-contract": "file:../task-contract"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tool-fs-search": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-subprocess": "0.1.0-rc.6",
+    "@deepseek-ai/cordis": "4.0.1"
+  },
+  "engines": {
+    "node": ">=22",
+    "os": [
+      "linux"
+    ]
+  }
+}

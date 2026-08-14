@@ -1,0 +1,27 @@
+{
+  "name": "@dsh-dsworker/profile-headless-dev",
+  "version": "0.0.0-v0",
+  "private": true,
+  "dependencies": {
+    "@dsh-dsworker/bundle-core": "file:../../packages/bundle-core",
+    "@dsh-dsworker/execution-containment": "file:../../packages/execution-containment",
+    "@dsh-dsworker/path-authority": "file:../../packages/path-authority",
+    "@dsh-dsworker/plugin-path-guard": "file:../../packages/plugin-path-guard",
+    "@dsh-dsworker/plugin-request-trace": "file:../../packages/plugin-request-trace",
+    "@dsh-dsworker/plugin-task-check": "file:../../packages/plugin-task-check",
+    "@dsh-dsworker/task-check-core": "file:../../packages/task-check-core",
+    "@dsh-dsworker/task-check-local": "file:../../packages/task-check-local",
+    "@dsh-dsworker/task-contract": "file:../../packages/task-contract",
+    "@dsh-dsworker/workspace-delta": "file:../../packages/workspace-delta",
+    "@dsh-dsworker/worker-kernel": "file:../../packages/worker-kernel"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-headless",
+        "@dsh-dsworker/bundle-core"
+      ]
+    }
+  }
+}

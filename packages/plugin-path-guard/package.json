@@ -1,0 +1,27 @@
+{
+  "name": "@dsh-dsworker/plugin-path-guard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./binding": "./src/binding.js",
+    "./filesystem": "./src/filesystem.js",
+    "./mapping": "./src/mapping.js",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@dsh-dsworker/path-authority": "file:../path-authority",
+    "@dsh-dsworker/task-contract": "file:../task-contract"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-agent": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-fs": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.6"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,189 @@
+# v0 host overlay. Applied after @deepseek-ai/dsh-base and
+# @deepseek-ai/dsh-headless. Disabled rows remain explicit so a future reorder
+# cannot silently restore model-visible behavior.
+
+# The strict worker owns the subprocess boundary. The replacement implements
+# the same rc.6 ctx.subprocess seam and fails closed until the host binds one
+# disposable workspace.
+- id: subprocess
+  disabled: true
+
+- id: hmr
+  disabled: true
+
+- id: tools
+  config:
+    mode: native
+
+# Keep the model-neutral title fold, but remove the cold title-model request.
+- id: session-title-llm
+  disabled: true
+
+- id: session-telemetry-otel
+  disabled: true
+
+- id: llm-retry
+  disabled: true
+
+# No attachment backend means dsh-tool-fs does not register read_image.
+- id: attachment-local
+  disabled: true
+
+# The lean preset owns the complete model-facing tool plane.
+- id: tool-bash
+  disabled: true
+
+- id: tool-pwsh
+  disabled: true
+
+- id: tool-fs
+  disabled: true
+
+- id: tool-fs-search
+  disabled: true
+
+- id: tool-str-replace-editor
+  disabled: true
+
+- id: repeat-tool-reminder
+  disabled: true
+
+# Background execution is disabled in the preset, so no jobs service or
+# model-facing job controls are needed in v0.
+- id: jobs
+  disabled: true
+
+- id: tool-jobs
+  disabled: true
+
+# Ambient repository instructions and broad skill discovery are intentionally
+# absent from the immutable v0 geometry.
+- id: agent-instructions
+  disabled: true
+
+- id: skill
+  disabled: true
+
+- id: skill-filesystem
+  disabled: true
+
+- id: skill-badge
+  disabled: true
+
+- id: tool-skill
+  disabled: true
+
+# Command, goal, plan, todo and autonomous surfaces are future overlays.
+- id: commands
+  disabled: true
+
+- id: command-feedback
+  disabled: true
+
+- id: command-goal
+  disabled: true
+
+- id: command-compact
+  disabled: true
+
+- id: goal
+  disabled: true
+
+- id: goal-round-driver
+  disabled: true
+
+- id: tool-goal
+  disabled: true
+
+- id: plan-mode
+  disabled: true
+
+- id: tool-todo
+  disabled: true
+
+# Compaction and pruning move to the agent preset so future routes share the
+# same behavior without exposing unrelated host rows globally.
+- id: compaction-basic
+  disabled: true
+
+- id: tool-result-pruner
+  disabled: true
+
+# Delegation/orchestration is a later, opt-in bundle.
+- id: subagent
+  disabled: true
+
+- id: subagent-spawn-in-process
+  disabled: true
+
+- id: subagent-fork-in-process
+  disabled: true
+
+- id: tool-subagent-control
+  disabled: true
+
+- id: tool-subagent-list-agents
+  disabled: true
+
+- id: tool-subagent
+  disabled: true
+
+- id: tool-subagent-fork
+  disabled: true
+
+- id: tool-subagent-report
+  disabled: true
+
+- id: workflow-worker-thread
+  disabled: true
+
+- id: tool-workflow
+  disabled: true
+
+- id: tool-ralph
+  disabled: true
+
+# Search is an auxiliary model/network route, not a default coding capability.
+- id: web
+  disabled: true
+
+- id: web-search-deepseek
+  disabled: true
+
+- id: tool-web
+  disabled: true
+
+# dsh-headless inserts Code/PTC and its one-shot driver. v0 is deliberately a
+# composition laboratory: it mounts neither and cannot accidentally submit a
+# task merely by booting this profile.
+- id: code-runtime
+  disabled: true
+
+- id: headless-startup
+  disabled: true
+
+- id: headless-runner
+  disabled: true
+
+- insert:
+    - id: execution-containment
+      name: '@dsh-dsworker/execution-containment'
+
+    - id: path-guard
+      name: '@dsh-dsworker/plugin-path-guard'
+
+    # Service only. The model-facing task_check tool is registered agent-locally
+    # only after a runner supplies the genuine contract and pre-mutation binding.
+    - id: task-check
+      name: '@dsh-dsworker/plugin-task-check'
+
+    - id: request-trace
+      name: '@dsh-dsworker/plugin-request-trace'
+      config:
+        destination: !!js process.env.DSH_REQUEST_TRACE_PATH
+
+    - id: agent-presets
+      name: '@deepseek-ai/dsh-agent-presets'
+      config:
+        default: lean-coding
+        includeUserRoot: true

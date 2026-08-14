@@ -1,0 +1,59 @@
+{
+  "name": "dsh-dsworker",
+  "version": "0.1.0",
+  "description": "Provider-agnostic deterministic worker harness built on DeepSeek Harness",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nocehi/dsh-dsworker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nocehi/dsh-dsworker/issues"
+  },
+  "homepage": "https://github.com/Nocehi/dsh-dsworker#readme",
+  "type": "module",
+  "packageManager": "npm@12.0.1",
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@dsh-dsworker/execution-containment": "file:packages/execution-containment",
+    "@dsh-dsworker/path-authority": "file:packages/path-authority",
+    "@dsh-dsworker/plugin-path-guard": "file:packages/plugin-path-guard",
+    "@dsh-dsworker/plugin-task-check": "file:packages/plugin-task-check",
+    "@dsh-dsworker/task-check-core": "file:packages/task-check-core",
+    "@dsh-dsworker/task-check-local": "file:packages/task-check-local",
+    "@dsh-dsworker/task-contract": "file:packages/task-contract",
+    "@dsh-dsworker/workspace-delta": "file:packages/workspace-delta",
+    "@dsh-dsworker/worker-kernel": "file:packages/worker-kernel"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh": "0.1.0-rc.6"
+  },
+  "scripts": {
+    "link:rc6": "node scripts/link-local-rc6.mjs",
+    "pretest": "node scripts/link-local-rc6.mjs",
+    "test": "node --test tests/unit/*.test.js tests/composition/*.test.js tests/integration/*.test.js",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:composition": "node --test tests/composition/*.test.js",
+    "test:integration": "node --test tests/integration/*.test.js",
+    "snapshots:update": "UPDATE_SNAPSHOTS=1 node --test tests/composition/composition.test.js",
+    "worker:run": "node packages/worker-kernel/bin/dsh-dsworker-run.js",
+    "syntax": "node scripts/check-syntax.mjs",
+    "check": "npm run syntax && npm test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "os": [
+    "linux"
+  ],
+  "allowScripts": {
+    "@deepseek-ai/dsh-subprocess-local@0.1.0-rc.6": true,
+    "@google/genai": false,
+    "koffi": false,
+    "node-pty@1.1.0": true,
+    "protobufjs": false
+  }
+}

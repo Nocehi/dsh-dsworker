@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+*.jsonl
+*.log
+.tmp/
+.dsh/
+.zig-cache/
+zig-out/
+*.tgz
+.DS_Store

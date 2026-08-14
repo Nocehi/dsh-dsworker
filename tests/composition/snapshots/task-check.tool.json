@@ -1,0 +1,10 @@
+{
+  "description": "Run the single authoritative host-side task check after completing the task. Call exactly once with no arguments. GREEN ends this agent turn; RED or ABORTED reports bounded deterministic findings and does not end it.",
+  "name": "task_check",
+  "parameters": {
+    "additionalProperties": false,
+    "properties": {},
+    "required": [],
+    "type": "object"
+  }
+}

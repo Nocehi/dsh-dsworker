@@ -1,0 +1,33 @@
+{
+  "name": "@dsh-dsworker/bundle-core",
+  "version": "0.0.0-v0",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "@dsh-dsworker/execution-containment": "file:../execution-containment",
+    "@dsh-dsworker/plugin-path-guard": "file:../plugin-path-guard",
+    "@dsh-dsworker/plugin-request-trace": "file:../plugin-request-trace",
+    "@dsh-dsworker/plugin-task-check": "file:../plugin-task-check"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-agent-presets": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-compaction-basic": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-compaction-tool-result-pruner": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-persona": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-tool-bash": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-tool-fs": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-tool-fs-search": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-subprocess-local": "0.1.0-rc.6"
+  }
+}

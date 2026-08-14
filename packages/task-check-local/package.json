@@ -1,0 +1,23 @@
+{
+  "name": "@dsh-dsworker/task-check-local",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./environment": "./src/environment.js",
+    "./snapshot": "./src/snapshot.js",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@dsh-dsworker/execution-containment": "file:../execution-containment",
+    "@dsh-dsworker/path-authority": "file:../path-authority",
+    "@dsh-dsworker/task-check-core": "file:../task-check-core",
+    "@dsh-dsworker/task-contract": "file:../task-contract"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

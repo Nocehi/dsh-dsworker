@@ -1,0 +1,266 @@
+{
+  "authority": {
+    "version": "dsh-dsworker/task-contract/v1",
+    "taskId": "zigsh-pipeline-cleanup-null-child",
+    "objective": "Fix the existing process-cleanup defect in src/pipeline.zig: cleanupStarted must safely tolerate an already-settled child whose id is null, while continuing to terminate and reap every still-running started child. Add a focused regression test in the same file and keep all existing pipeline behavior unchanged. Use node .dsh-dsworker/pipeline-cleanup-oracle.mjs for focused verification; it keeps Zig compiler and test caches outside the source tree.",
+    "workspace": {
+      "root": "runner-supplied",
+      "commandCwdPolicy": "workspace-relative-only",
+      "symlinkPolicy": "unsupported"
+    },
+    "paths": {
+      "mutable": [
+        {
+          "path": "src/pipeline.zig",
+          "kind": "file"
+        }
+      ],
+      "immutable": [
+        {
+          "path": ".dsh-dsworker/pipeline-cleanup-oracle.mjs",
+          "kind": "file",
+          "sha256": "7d719588cf54ed190bce526b2698ab0391735beb0fac4aafb4775646b96c07c8"
+        },
+        {
+          "path": ".git",
+          "kind": "directory"
+        },
+        {
+          "path": ".gitignore",
+          "kind": "file",
+          "sha256": "d2719de4e760b1e769f215e9372fe821aa110188252219aaa40fb74476d5643d"
+        },
+        {
+          "path": ".zig-cache",
+          "kind": "directory"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "file",
+          "sha256": "338f73e4a34b8e47e72058d5b4001c77b625003de1bb6275fa665939131098a8"
+        },
+        {
+          "path": "build.zig",
+          "kind": "file",
+          "sha256": "962119cc1a36cde4b95bfd3e631c76f15b3a9719f829c924bf78b403d9255b44"
+        },
+        {
+          "path": "build.zig.zon",
+          "kind": "file",
+          "sha256": "07e6e1f4e3219135fcdb01b6604d880e5c2208a79a0e299670d8f330e78ee94a"
+        },
+        {
+          "path": "docs/language-ledger.md",
+          "kind": "file",
+          "sha256": "efa75fc336bbf1d2a809cf1afc6ccdf4261363832913b43f5669f3746a305f63"
+        },
+        {
+          "path": "src/bridge.zig",
+          "kind": "file",
+          "sha256": "3897068a020c78f7afcb4a218832880e0d368d6048738a2cc6d027fe60198298"
+        },
+        {
+          "path": "src/builtin.zig",
+          "kind": "file",
+          "sha256": "85660744068009ebec227da58208370b03329fc9de68e6abfca4b7ae363d7107"
+        },
+        {
+          "path": "src/exec.zig",
+          "kind": "file",
+          "sha256": "c63a93fd0102c96f21db10df7062badeb4f068be6023782059583bd178717192"
+        },
+        {
+          "path": "src/lex.zig",
+          "kind": "file",
+          "sha256": "7a11b7460daab9e97ac27a0512637a96a249b8b307341cbd3d21c6631849cac6"
+        },
+        {
+          "path": "src/main.zig",
+          "kind": "file",
+          "sha256": "96e344fda0a9c9202ff07a96faa205c3dc892c2623b58cb2df216b286f111e5c"
+        },
+        {
+          "path": "src/mixed.zig",
+          "kind": "file",
+          "sha256": "3ef9cc6e57df6846aafef89b6c81f53c54a147bffbfa5f15dbe0133b4ca83c37"
+        },
+        {
+          "path": "src/parse.zig",
+          "kind": "file",
+          "sha256": "de0cbd76f84ee6289393cfa8feaa1261b3755b6b9c049ae07a87b24e745bf688"
+        },
+        {
+          "path": "src/repl.zig",
+          "kind": "file",
+          "sha256": "e9098a895fd3e4b39f7c1c509e816efae845f62e669fe8d791a469dc287919a6"
+        },
+        {
+          "path": "src/root.zig",
+          "kind": "file",
+          "sha256": "ee71878c5db17ff07c964035d2ae354df84c7add35753145c4094acaf1fa9fa7"
+        },
+        {
+          "path": "src/stream.zig",
+          "kind": "file",
+          "sha256": "4e83f34e5029cdb3947122ea5ce6187450e29b58892bc63f64b2e88e37eddd6b"
+        },
+        {
+          "path": "src/typed.zig",
+          "kind": "file",
+          "sha256": "964be2cdd67a9a4f5d629587a93e776c54a0f41248189bd980675b7c1aa26c0e"
+        }
+      ]
+    },
+    "commands": {
+      "semantic": [
+        {
+          "id": "immutable-pipeline-cleanup-oracle",
+          "executable": "node",
+          "argv": [
+            ".dsh-dsworker/pipeline-cleanup-oracle.mjs"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "ZIG_GLOBAL_CACHE_DIR": "/tmp/zig-cache/global",
+            "ZIG_LOCAL_CACHE_DIR": "/tmp/zig-cache/local"
+          },
+          "timeoutMs": 120000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        },
+        {
+          "id": "focused-pipeline-tests",
+          "executable": "zig",
+          "argv": [
+            "test",
+            "src/pipeline.zig"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "ZIG_GLOBAL_CACHE_DIR": "/tmp/zig-cache/global",
+            "ZIG_LOCAL_CACHE_DIR": "/tmp/zig-cache/local"
+          },
+          "timeoutMs": 120000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        },
+        {
+          "id": "full-zig-test-suite",
+          "executable": "zig",
+          "argv": [
+            "build",
+            "test",
+            "--summary",
+            "all"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "ZIG_GLOBAL_CACHE_DIR": "/tmp/zig-cache/global",
+            "ZIG_LOCAL_CACHE_DIR": "/tmp/zig-cache/local"
+          },
+          "timeoutMs": 180000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        }
+      ],
+      "validation": [
+        {
+          "id": "zig-format-check",
+          "executable": "zig",
+          "argv": [
+            "fmt",
+            "--check",
+            "build.zig",
+            "src"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "ZIG_GLOBAL_CACHE_DIR": "/tmp/zig-cache/global",
+            "ZIG_LOCAL_CACHE_DIR": "/tmp/zig-cache/local"
+          },
+          "timeoutMs": 60000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        },
+        {
+          "id": "zig-build",
+          "executable": "zig",
+          "argv": [
+            "build",
+            "--summary",
+            "all",
+            "--prefix",
+            "/tmp/zig-cache/prefix"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {
+            "ZIG_GLOBAL_CACHE_DIR": "/tmp/zig-cache/global",
+            "ZIG_LOCAL_CACHE_DIR": "/tmp/zig-cache/local"
+          },
+          "timeoutMs": 180000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        }
+      ],
+      "finish": [
+        {
+          "id": "git-diff-check",
+          "executable": "git",
+          "argv": [
+            "diff",
+            "--check"
+          ],
+          "cwd": {
+            "kind": "workspace-root"
+          },
+          "environment": {},
+          "timeoutMs": 30000,
+          "expected": {
+            "exitCodes": [
+              0
+            ]
+          }
+        }
+      ]
+    },
+    "retry": {
+      "mode": "none",
+      "maxAttempts": 1
+    },
+    "terminal": {
+      "success": "all-authoritative-commands-pass",
+      "failure": "fail-closed"
+    }
+  },
+  "metadata": {
+    "repository": "/home/nocehi/zigsh",
+    "sourceBaseSha": "9a0fec8cd1815ad468e3dc91c801647ec5887f3d",
+    "purpose": "first-real-zigsh-dogfood",
+    "cachePolicy": "compiler-cache-private-tmp-and-empty-immutable-testing-cache-root"
+  }
+}

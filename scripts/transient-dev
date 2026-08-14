@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
+node_bin=$(command -v node)
+rc6_cli=$("$node_bin" "$repo_root/scripts/resolve-rc6-cli.mjs")
+keep=0
+dump_flag=--dump-config
+
+for arg in "$@"; do
+  case "$arg" in
+    --keep) keep=1 ;;
+    --dump-default-config) dump_flag=--dump-default-config ;;
+    --dump-config) dump_flag=--dump-config ;;
+    *)
+      echo "usage: scripts/transient-dev [--keep] [--dump-config|--dump-default-config]" >&2
+      exit 64
+      ;;
+  esac
+done
+
+dev_root=$(mktemp -d /tmp/dsh-dsworker-dev.XXXXXX)
+cleanup() {
+  if [[ "$keep" -eq 1 ]]; then
+    echo "kept transient DSH_HOME: $dev_root" >&2
+    return
+  fi
+  case "$dev_root" in
+    /tmp/dsh-dsworker-dev.*) rm -rf -- "$dev_root" ;;
+    *) echo "refusing to remove unexpected path: $dev_root" >&2; exit 70 ;;
+  esac
+}
+trap cleanup EXIT
+
+"$node_bin" "$repo_root/scripts/materialize-profile.mjs" "$dev_root" >&2
+echo "validated transient DSH_HOME: $dev_root" >&2
+
+env -i \
+  PATH=/usr/bin:/bin \
+  DSH_HOME="$dev_root" \
+  DSH_REQUEST_TRACE_PATH="$dev_root/traces/requests.jsonl" \
+  DSH_TELEMETRY_DISABLED=1 \
+  "$node_bin" "$rc6_cli" --profile headless-dev "$dump_flag"
