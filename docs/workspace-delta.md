@@ -32,7 +32,9 @@ not claim that every promoted byte was authored by the model trajectory.
 separately as baseline -> preCommands (model-phase surviving effects),
 preCommands -> postCommands (authoritative-command effects), and baseline ->
 postCommands (final effects). This host-only evidence does not change the GREEN
-predicate or the model-facing `task_check` projection.
+predicate or the model-facing `task_check` projection. See
+[task-check-effect-attribution.md](task-check-effect-attribution.md) for the
+exact semantics and limits of that evidence.
 
 ## Promotable subset
 
