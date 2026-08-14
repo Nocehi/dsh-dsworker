@@ -472,6 +472,11 @@ export async function runTaskCheck(binding, input) {
       state.baseline,
       postCommandsSnapshot,
     );
+    const commandEffects = compareWorkspaceSnapshots(
+      state.contract,
+      preCommandsSnapshot,
+      postCommandsSnapshot,
+    );
     const postImmutable = verifyImmutableAuthority(
       state.contract,
       state.baseline,
@@ -497,6 +502,11 @@ export async function runTaskCheck(binding, input) {
       commands,
       infrastructureFailures: [],
       cancelled,
+      effectAttribution: {
+        modelPhase: preScope,
+        authoritativeCommandPhase: commandEffects,
+        final: postScope,
+      },
     });
   } finally {
     state.running = false;
