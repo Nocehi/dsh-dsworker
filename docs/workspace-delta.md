@@ -26,6 +26,14 @@ The binding is single-use and deeply immutable. It creates no Loader row,
 prompt section, tool schema, durable context, session event, provider input, or
 credential access.
 
+WorkspaceDelta deliberately remains a **baseline -> final** artifact. It does
+not claim that every promoted byte was authored by the model trajectory.
+`TaskCheckResult.effectAttribution` records the existing checkpoint boundaries
+separately as baseline -> preCommands (model-phase surviving effects),
+preCommands -> postCommands (authoritative-command effects), and baseline ->
+postCommands (final effects). This host-only evidence does not change the GREEN
+predicate or the model-facing `task_check` projection.
+
 ## Promotable subset
 
 The first handoff deliberately supports ordinary single-link UTF-8 files with
