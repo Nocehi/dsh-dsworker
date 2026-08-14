@@ -253,6 +253,37 @@ function parseCheckpoints(value, path, kind) {
   };
 }
 
+/** @param {unknown} value @param {string} path */
+function parseEffectAttribution(value, path) {
+  const data = apiObject(value, path);
+  const names = ["modelPhase", "authoritativeCommandPhase", "final"];
+  closedObject(data, names, names, path);
+  const modelPhase = parseCheckpoint(data.modelPhase, `${path}.modelPhase`, "scope");
+  const authoritativeCommandPhase = parseCheckpoint(
+    data.authoritativeCommandPhase,
+    `${path}.authoritativeCommandPhase`,
+    "scope",
+  );
+  const final = parseCheckpoint(data.final, `${path}.final`, "scope");
+  return {
+    modelPhase: {
+      from: "baseline",
+      to: "preCommands",
+      ...modelPhase,
+    },
+    authoritativeCommandPhase: {
+      from: "preCommands",
+      to: "postCommands",
+      ...authoritativeCommandPhase,
+    },
+    final: {
+      from: "baseline",
+      to: "postCommands",
+      ...final,
+    },
+  };
+}
+
 /** @param {unknown} value @param {string} path @param {any} authorityCommand @param {string} phase */
 function parseCommandOutcome(value, path, authorityCommand, phase) {
   const data = apiObject(value, path);
@@ -346,6 +377,7 @@ function commandFailure(command) {
 /**
  * Assemble the sole authoritative terminal predicate from deterministic host
  * facts. This pure function never reads a filesystem or executes a command.
+ * Optional effect attribution is host evidence only and never changes GREEN.
  *
  * @param {unknown} contract
  * @param {unknown} input
@@ -358,12 +390,13 @@ export function evaluateTaskCheck(contract, input) {
     );
   }
   const data = apiObject(input, "$.input");
-  const fields = [
+  const requiredFields = [
     "contract", "contractSha256", "workspaceIdentity", "baseline", "preCommands",
     "postCommands", "scope", "immutable", "commands", "infrastructureFailures",
     "cancelled",
   ];
-  closedObject(data, fields, fields, "$.input");
+  const fields = [...requiredFields, "effectAttribution"];
+  closedObject(data, fields, requiredFields, "$.input");
   if (data.contract !== contract || data.contractSha256 !== contract.contractSha256) {
     throw new TaskCheckCoreError("task-check authority identity mismatch", {
       code: "task-contract-identity-mismatch",
@@ -376,6 +409,9 @@ export function evaluateTaskCheck(contract, input) {
   const postCommands = parseSnapshot(data.postCommands, "$.input.postCommands");
   const scope = parseCheckpoints(data.scope, "$.input.scope", "scope");
   const immutable = parseCheckpoints(data.immutable, "$.input.immutable", "immutable");
+  const effectAttribution = Object.hasOwn(data, "effectAttribution")
+    ? parseEffectAttribution(data.effectAttribution, "$.input.effectAttribution")
+    : null;
   if (!Array.isArray(data.commands)) {
     throw new TaskCheckCoreError("$.input.commands must be an array", {
       code: "invalid-array",
@@ -444,6 +480,7 @@ export function evaluateTaskCheck(contract, input) {
     immutable,
     commands,
     failures,
+    effectAttribution,
     greenPredicate: {
       baselineValid: baseline.ok,
       preCommandSnapshotValid: preCommands.ok,
