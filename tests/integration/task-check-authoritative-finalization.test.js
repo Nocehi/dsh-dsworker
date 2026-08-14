@@ -10,6 +10,7 @@ import {
 } from "node:fs/promises";
 import { join } from "node:path";
 import { test } from "node:test";
+import { isTaskCheckResult } from "@dsh-dsworker/task-check-core";
 import {
   createTaskCheckBinding,
   disposeTaskCheckBinding,
@@ -46,8 +47,8 @@ function contract() {
   return parseTaskContract({
     authority: {
       version: TASK_CONTRACT_VERSION,
-      taskId: "task-check-effect-attribution",
-      objective: "Characterize authoritative command effects separately from model-phase effects.",
+      taskId: "task-check-authoritative-finalization",
+      objective: "Characterize TaskCheck v1 finalization of an authorized pre-command state.",
       workspace: {
         root: "runner-supplied",
         commandCwdPolicy: "workspace-relative-only",
@@ -60,7 +61,7 @@ function contract() {
       commands: {
         semantic: [
           command(
-            "repair-target",
+            "finalize-target",
             "require('node:fs').writeFileSync('src/target.txt', 'correct\\n', 'utf8')",
           ),
         ],
@@ -81,8 +82,8 @@ function contract() {
   });
 }
 
-test("GREEN attributes model-phase and authoritative-command effects separately", async () => {
-  const root = await mkdtemp("/tmp/dsh-dsworker-effect-attribution.");
+test("TaskCheck v1 permits authoritative finalization before GREEN and WorkspaceDelta", async () => {
+  const root = await mkdtemp("/tmp/dsh-dsworker-authoritative-finalization.");
   const source = join(root, "source");
   const workspace = join(root, "workspace");
   const taskContract = contract();
@@ -93,6 +94,8 @@ test("GREEN attributes model-phase and authoritative-command effects separately"
     await mkdir(join(source, "src"), { recursive: true });
     await writeFile(join(source, "src", "target.txt"), "old\n", "utf8");
     await cp(source, workspace, { recursive: true, preserveTimestamps: true });
+    assert.equal(await readFile(join(source, "src", "target.txt"), "utf8"), "old\n");
+    assert.equal(await readFile(join(workspace, "src", "target.txt"), "utf8"), "old\n");
 
     deltaBinding = await createWorkspaceDeltaBinding({
       contract: taskContract,
@@ -105,45 +108,22 @@ test("GREEN attributes model-phase and authoritative-command effects separately"
       baseEnvironment: TEST_BASE_ENVIRONMENT,
     });
 
-    // This is the state submitted to TaskCheck by the scripted model phase.
+    // This is only the state present at the pre-command checkpoint. The
+    // characterization makes no causal authorship claim about that state.
     await writeFile(join(workspace, "src", "target.txt"), "wrong\n", "utf8");
+    assert.equal(await readFile(join(workspace, "src", "target.txt"), "utf8"), "wrong\n");
 
     const result = await runTaskCheck(taskCheckBinding, {
       contract: taskContract,
       workspaceRoot: workspace,
     });
 
+    assert.equal(isTaskCheckResult(result), true);
     assert.equal(result.status, "green");
     assert.equal(result.scope.preCommands.ok, true);
     assert.equal(result.scope.postCommands.ok, true);
     assert.deepEqual(result.scope.preCommands.changedPaths, ["src/target.txt"]);
     assert.deepEqual(result.scope.postCommands.changedPaths, ["src/target.txt"]);
-
-    assert.notEqual(result.effectAttribution, null);
-    assert.deepEqual(result.effectAttribution.modelPhase.changedPaths, ["src/target.txt"]);
-    assert.equal(result.effectAttribution.modelPhase.from, "baseline");
-    assert.equal(result.effectAttribution.modelPhase.to, "preCommands");
-    assert.deepEqual(
-      result.effectAttribution.authoritativeCommandPhase.changedPaths,
-      ["src/target.txt"],
-    );
-    assert.equal(
-      result.effectAttribution.authoritativeCommandPhase.from,
-      "preCommands",
-    );
-    assert.equal(
-      result.effectAttribution.authoritativeCommandPhase.to,
-      "postCommands",
-    );
-    assert.deepEqual(result.effectAttribution.final.changedPaths, ["src/target.txt"]);
-    assert.equal(result.effectAttribution.final.from, "baseline");
-    assert.equal(result.effectAttribution.final.to, "postCommands");
-    assert.equal(Object.isFrozen(result.effectAttribution), true);
-    assert.equal(
-      Object.isFrozen(result.effectAttribution.authoritativeCommandPhase.changes),
-      true,
-    );
-
     assert.deepEqual(
       result.commands.map(({ phase, commandId, passed }) => ({
         phase,
@@ -151,7 +131,7 @@ test("GREEN attributes model-phase and authoritative-command effects separately"
         passed,
       })),
       [
-        { phase: "semantic", commandId: "repair-target", passed: true },
+        { phase: "semantic", commandId: "finalize-target", passed: true },
         { phase: "validation", commandId: "verify-target", passed: true },
       ],
     );
@@ -163,6 +143,8 @@ test("GREEN attributes model-phase and authoritative-command effects separately"
       workspaceRoot: workspace,
     });
     assert.deepEqual(delta.changedPaths, ["src/target.txt"]);
+    assert.equal(delta.changes.length, 1);
+    assert.equal(delta.changes[0].path, "src/target.txt");
     assert.equal(delta.changes[0].kind, "modify");
     assert.equal(delta.changes[0].beforeSha256, sha256("old\n"));
     assert.equal(delta.changes[0].afterSha256, sha256("correct\n"));

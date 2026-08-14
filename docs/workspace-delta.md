@@ -26,15 +26,13 @@ The binding is single-use and deeply immutable. It creates no Loader row,
 prompt section, tool schema, durable context, session event, provider input, or
 credential access.
 
-WorkspaceDelta deliberately remains a **baseline -> final** artifact. It does
-not claim that every promoted byte was authored by the model trajectory.
-`TaskCheckResult.effectAttribution` records the existing checkpoint boundaries
-separately as baseline -> preCommands (model-phase surviving effects),
-preCommands -> postCommands (authoritative-command effects), and baseline ->
-postCommands (final effects). This host-only evidence does not change the GREEN
-predicate or the model-facing `task_check` projection. See
-[task-check-effect-attribution.md](task-check-effect-attribution.md) for the
-exact semantics and limits of that evidence.
+WorkspaceDelta deliberately remains a **baseline -> final** promotable-content
+artifact. TaskCheck v1 permits authoritative commands to transform paths that
+are already covered by mutable authority before the post-command checked state
+reaches GREEN. WorkspaceDelta therefore does not prove which actor produced
+each promoted byte, and TaskCheck v1 does not claim verifier non-interference.
+See [task-check-authoritative-finalization.md](task-check-authoritative-finalization.md)
+for the provider-free characterization of that behavior.
 
 ## Promotable subset
 
