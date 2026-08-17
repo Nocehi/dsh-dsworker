@@ -12,14 +12,14 @@ import {
 } from "../../packages/plugin-request-trace/src/canonical.js";
 import { materializeProfile } from "../../scripts/materialize-profile.mjs";
 import {
-  rc6CliPath,
-  rc6NodeModules,
+  dshCliPath,
+  dshNodeModules,
   REPO_ROOT,
   REQUIRED_DSH_VERSION,
 } from "../../scripts/local-resolution.mjs";
 
-const RC6_NODE_MODULES = rc6NodeModules();
-const DSH_CLI = rc6CliPath();
+const DSH_NODE_MODULES = dshNodeModules();
+const DSH_CLI = dshCliPath();
 const SNAPSHOT_DIR = join(REPO_ROOT, "tests", "composition", "snapshots");
 const EXPECTED_TOOLS = ["bash", "edit", "glob", "grep", "read", "write"];
 const EXPECTED_BOUND_TOOLS = [...EXPECTED_TOOLS, "task_check"].sort();
@@ -74,7 +74,7 @@ async function collectMode(root, mode) {
     run(process.execPath, [DSH_CLI, "--profile", "headless-dev", "--dump-config"], {
       cwd: REPO_ROOT,
       env,
-      // rc.6's CLI relaunch path reliably preserves dump output through an
+      // The pinned CLI relaunch path reliably preserves dump output through an
       // inherited descriptor; a nested spawnSync pipe can be empty on success.
       stdio: ["ignore", dumpFile.fd, "pipe"],
     });
@@ -82,7 +82,7 @@ async function collectMode(root, mode) {
     await dumpFile.close();
   }
   const configText = await readFile(composedPath, "utf8");
-  assert.match(configText, /^# == /u, "rc.6 dump-config output was empty");
+  assert.match(configText, /^# == /u, "DSH dump-config output was empty");
   const outputPath = join(dshHome, `snapshot-${mode}.json`);
   run(
     process.execPath,
@@ -127,7 +127,7 @@ async function assertOrUpdateSnapshot(name, actual) {
   assert.equal(actual, await readFile(path, "utf8"), `snapshot mismatch: ${name}`);
 }
 
-test("headless-dev composes rc.6 lean preset and trace has zero model geometry", async () => {
+test("headless-dev composes the rc.7 lean preset and trace has zero model geometry", async () => {
   const temp = await mkdtemp("/tmp/dsh-dsworker-composition.");
   try {
     const on = await collectMode(temp, "on");
@@ -136,7 +136,7 @@ test("headless-dev composes rc.6 lean preset and trace has zero model geometry",
     const taskCheckOff = await collectMode(temp, "task-check-off");
     const taskCheckBound = await collectMode(temp, "task-check-bound");
 
-    assert.equal(on.materialized.rc6Version, REQUIRED_DSH_VERSION);
+    assert.equal(on.materialized.dshVersion, REQUIRED_DSH_VERSION);
     for (const [resolution, packageName] of [
       [on.runtime.bundleResolution, "bundle-core"],
       [on.runtime.pluginResolution, "plugin-request-trace"],
@@ -211,10 +211,10 @@ test("headless-dev composes rc.6 lean preset and trace has zero model geometry",
       "@dsh-dsworker/workspace-delta": "file:../workspace-delta",
     });
     assert.deepEqual(workerKernelManifest.peerDependencies, {
-      "@deepseek-ai/dsh-agent": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-app-boot": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-llm": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-session": "0.1.0-rc.6",
+      "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-app-boot": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-llm": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-session": "0.1.0-rc.7",
     });
     const pathGuardManifest = JSON.parse(
       await readFile(on.runtime.pathGuardResolution, "utf8"),
@@ -226,9 +226,9 @@ test("headless-dev composes rc.6 lean preset and trace has zero model geometry",
     });
     assert.deepEqual(pathGuardManifest.peerDependencies, {
       "@deepseek-ai/cordis": "^4.0.1",
-      "@deepseek-ai/dsh-agent": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-fs": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-tools": "0.1.0-rc.6",
+      "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-fs": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-tools": "0.1.0-rc.7",
     });
     const pathAuthorityManifest = JSON.parse(
       await readFile(on.runtime.pathAuthorityResolution, "utf8"),
@@ -243,9 +243,9 @@ test("headless-dev composes rc.6 lean preset and trace has zero model geometry",
     });
     assert.deepEqual(taskCheckPluginManifest.peerDependencies, {
       "@deepseek-ai/cordis": "^4.0.1",
-      "@deepseek-ai/dsh-agent": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-llm": "0.1.0-rc.6",
-      "@deepseek-ai/dsh-tools": "0.1.0-rc.6",
+      "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-llm": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-tools": "0.1.0-rc.7",
     });
     assert.deepEqual(pathAuthorityManifest.dependencies, {
       "@dsh-dsworker/task-contract": "file:../task-contract",
@@ -344,7 +344,7 @@ test("headless-dev composes rc.6 lean preset and trace has zero model geometry",
     );
     assert.equal(
       on.runtime.dshResolution,
-      join(RC6_NODE_MODULES, "@deepseek-ai", "dsh", "package.json"),
+      join(DSH_NODE_MODULES, "@deepseek-ai", "dsh", "package.json"),
     );
 
     assert.deepEqual(on.runtime.tools, off.runtime.tools);
