@@ -4,21 +4,28 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-export const REQUIRED_DSH_VERSION = "0.1.0-rc.6";
 const requireFromRepository = createRequire(join(REPO_ROOT, "package.json"));
+const repositoryManifest = requireFromRepository("./package.json");
+const configuredDshVersion = repositoryManifest.devDependencies?.["@deepseek-ai/dsh"];
+if (typeof configuredDshVersion !== "string" || configuredDshVersion.trim() === "") {
+  throw new Error(
+    'root package.json must declare an exact @deepseek-ai/dsh development dependency',
+  );
+}
+export const REQUIRED_DSH_VERSION = configuredDshVersion;
 
 /**
  * Resolve the external DeepSeek Harness installation. Normal package
- * resolution is authoritative; DSH_RC6_NODE_MODULES is an explicit local
+ * resolution is authoritative; DSH_NODE_MODULES is an explicit local
  * development override, not a machine-specific default.
  *
  * @param {{override?: string, resolveManifest?: (specifier: string) => string}} [options]
  */
-export function rc6NodeModules(options = {}) {
-  const override = options.override ?? process.env.DSH_RC6_NODE_MODULES;
+export function dshNodeModules(options = {}) {
+  const override = options.override ?? process.env.DSH_NODE_MODULES;
   if (override !== undefined) {
     if (typeof override !== "string" || override.trim() === "") {
-      throw new TypeError("DSH_RC6_NODE_MODULES must be a non-empty path");
+      throw new TypeError("DSH_NODE_MODULES must be a non-empty path");
     }
     return resolve(override);
   }
@@ -29,7 +36,7 @@ export function rc6NodeModules(options = {}) {
     manifestPath = resolveManifest("@deepseek-ai/dsh/package.json");
   } catch (cause) {
     throw new Error(
-      `cannot resolve @deepseek-ai/dsh ${REQUIRED_DSH_VERSION} from this project; run npm install (or npm ci), or set DSH_RC6_NODE_MODULES to an existing exact rc.6 node_modules directory`,
+      `cannot resolve @deepseek-ai/dsh ${REQUIRED_DSH_VERSION} from this project; run npm install (or npm ci), or set DSH_NODE_MODULES to an existing exact ${REQUIRED_DSH_VERSION} node_modules directory`,
       { cause },
     );
   }
@@ -45,8 +52,8 @@ export function rc6NodeModules(options = {}) {
 }
 
 /** @param {{root?: string, override?: string, resolveManifest?: (specifier: string) => string}} [options] */
-export async function assertRc6(options = {}) {
-  const root = resolve(options.root ?? rc6NodeModules(options));
+export async function assertDshVersion(options = {}) {
+  const root = resolve(options.root ?? dshNodeModules(options));
   const manifestPath = join(root, "@deepseek-ai", "dsh", "package.json");
   let manifest;
   try {
@@ -66,8 +73,8 @@ export async function assertRc6(options = {}) {
 }
 
 /** @param {{override?: string, resolveManifest?: (specifier: string) => string}} [options] */
-export function rc6CliPath(options = {}) {
-  return join(rc6NodeModules(options), "@deepseek-ai", "dsh", "lib", "bin.js");
+export function dshCliPath(options = {}) {
+  return join(dshNodeModules(options), "@deepseek-ai", "dsh", "lib", "bin.js");
 }
 
 async function ensureSymlink(linkPath, targetPath, type = "dir") {
@@ -89,10 +96,10 @@ async function ensureSymlink(linkPath, targetPath, type = "dir") {
 }
 
 export async function ensureRepoLinks() {
-  const rc6 = await assertRc6();
+  const dsh = await assertDshVersion();
   const modules = join(REPO_ROOT, "node_modules");
   const repositoryScope = join(modules, "@deepseek-ai");
-  const resolvedScope = join(rc6.root, "@deepseek-ai");
+  const resolvedScope = join(dsh.root, "@deepseek-ai");
   if (resolve(repositoryScope) !== resolve(resolvedScope)) {
     await ensureSymlink(repositoryScope, resolvedScope);
   }
@@ -140,15 +147,15 @@ export async function ensureRepoLinks() {
     join(modules, "@dsh-dsworker", "workspace-delta"),
     join(REPO_ROOT, "packages", "workspace-delta"),
   );
-  return rc6;
+  return dsh;
 }
 
 export async function linkProfileModules(profileDir) {
-  const rc6 = await assertRc6();
+  const dsh = await assertDshVersion();
   const modules = join(profileDir, "node_modules");
   await ensureSymlink(
     join(modules, "@deepseek-ai"),
-    join(rc6.root, "@deepseek-ai"),
+    join(dsh.root, "@deepseek-ai"),
   );
   await ensureSymlink(
     join(modules, "@dsh-dsworker", "plugin-request-trace"),
@@ -194,7 +201,7 @@ export async function linkProfileModules(profileDir) {
     join(modules, "@dsh-dsworker", "workspace-delta"),
     join(REPO_ROOT, "packages", "workspace-delta"),
   );
-  return rc6;
+  return dsh;
 }
 
 export function isInside(parent, candidate) {
