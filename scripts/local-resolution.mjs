@@ -77,6 +77,9 @@ export function dshCliPath(options = {}) {
   return join(dshNodeModules(options), "@deepseek-ai", "dsh", "lib", "bin.js");
 }
 
+/** Historical integration-test shim; resolves the configured DSH baseline, not rc.6. */
+export const rc6CliPath = dshCliPath;
+
 async function ensureSymlink(linkPath, targetPath, type = "dir") {
   await mkdir(dirname(linkPath), { recursive: true });
   try {
