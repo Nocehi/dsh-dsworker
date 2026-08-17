@@ -3,9 +3,9 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { test } from "node:test";
 import {
-  assertRc6,
-  rc6CliPath,
-  rc6NodeModules,
+  assertDshVersion,
+  dshCliPath,
+  dshNodeModules,
   REQUIRED_DSH_VERSION,
 } from "../../scripts/local-resolution.mjs";
 
@@ -21,21 +21,22 @@ async function fakeInstallation(version = REQUIRED_DSH_VERSION) {
   return root;
 }
 
-test("rc.6 resolves through ordinary project package resolution", async () => {
-  const root = rc6NodeModules();
-  const resolved = await assertRc6({ root });
+test("configured DSH baseline resolves through ordinary project package resolution", async () => {
+  assert.equal(REQUIRED_DSH_VERSION, "0.1.0-rc.7");
+  const root = dshNodeModules();
+  const resolved = await assertDshVersion({ root });
   assert.equal(resolved.version, REQUIRED_DSH_VERSION);
   assert.equal(
-    rc6CliPath(),
+    dshCliPath(),
     join(root, "@deepseek-ai", "dsh", "lib", "bin.js"),
   );
 });
 
-test("explicit DSH_RC6_NODE_MODULES-style override remains exact and version-checked", async () => {
+test("explicit DSH_NODE_MODULES-style override remains exact and version-checked", async () => {
   const root = await fakeInstallation();
   try {
-    assert.equal(rc6NodeModules({ override: root }), root);
-    assert.equal((await assertRc6({ override: root })).version, REQUIRED_DSH_VERSION);
+    assert.equal(dshNodeModules({ override: root }), root);
+    assert.equal((await assertDshVersion({ override: root })).version, REQUIRED_DSH_VERSION);
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -44,15 +45,15 @@ test("explicit DSH_RC6_NODE_MODULES-style override remains exact and version-che
 test("missing and mismatched overrides fail with actionable errors", async () => {
   const missing = join("/tmp", "dsh-dsworker-resolution-does-not-exist");
   await assert.rejects(
-    assertRc6({ override: missing }),
-    /cannot read @deepseek-ai\/dsh 0\.1\.0-rc\.6/u,
+    assertDshVersion({ override: missing }),
+    /cannot read @deepseek-ai\/dsh 0\.1\.0-rc\.7/u,
   );
 
-  const root = await fakeInstallation("0.1.0-rc.5");
+  const root = await fakeInstallation("0.1.0-rc.6");
   try {
     await assert.rejects(
-      assertRc6({ override: root }),
-      /expected @deepseek-ai\/dsh 0\.1\.0-rc\.6, found 0\.1\.0-rc\.5/u,
+      assertDshVersion({ override: root }),
+      /expected @deepseek-ai\/dsh 0\.1\.0-rc\.7, found 0\.1\.0-rc\.6/u,
     );
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -61,12 +62,12 @@ test("missing and mismatched overrides fail with actionable errors", async () =>
 
 test("resolver errors and empty overrides are fail-closed", () => {
   assert.throws(
-    () => rc6NodeModules({ override: "" }),
-    /DSH_RC6_NODE_MODULES must be a non-empty path/u,
+    () => dshNodeModules({ override: "" }),
+    /DSH_NODE_MODULES must be a non-empty path/u,
   );
   assert.throws(
     () =>
-      rc6NodeModules({
+      dshNodeModules({
         resolveManifest() {
           throw new Error("not installed");
         },
