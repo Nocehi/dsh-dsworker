@@ -1,7 +1,7 @@
 # dsh-dsworker repository instructions
 
 This repository is an out-of-tree DeepSeek Harness composition. Treat the
-project-installed `@deepseek-ai/*` `0.1.0-rc.6` closure as the implementation
+project-installed `@deepseek-ai/*` `0.1.0-rc.7` closure as the implementation
 authority until an explicit upgrade task changes that baseline.
 
 - Never edit or copy the official DSH installation.
