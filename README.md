@@ -28,7 +28,7 @@ The roles are deliberately separate:
 - **dsh-dsworker** is the active deterministic worker harness in this
   repository.
 - **DeepSeek Harness** is the external agent/runtime substrate, pinned here to
-  `@deepseek-ai/dsh@0.1.0-rc.6`.
+  `@deepseek-ai/dsh@0.1.0-rc.7`.
 - **Zigsh** is a production dogfood target. It is not a Bash replacement,
   `ctx.shell` implementation, or subprocess backend in this project.
 
@@ -36,7 +36,7 @@ The roles are deliberately separate:
 
 - a canonical, deeply immutable `TaskContract` shared by every authority
   consumer;
-- pure lexical `PathAuthority` plus an rc.6 guard for structured `edit` and
+- pure lexical `PathAuthority` plus a DSH-bound guard for structured `edit` and
   `write` calls;
 - Linux bubblewrap containment shared by model-controlled Bash and
   authoritative TaskCheck commands;
@@ -78,17 +78,18 @@ npm run check
 ```
 
 `npm ci` installs the exact root dependency
-`@deepseek-ai/dsh@0.1.0-rc.6` and its external closure, then links the local npm
+`@deepseek-ai/dsh@0.1.0-rc.7` and its external closure, then links the local npm
 workspaces. `npm run check` runs syntax validation and the complete unit,
-composition, fake-adapter, rc.6 lifecycle, containment, Git, and Zig-cache
+composition, fake-adapter, pinned-DSH lifecycle, containment, Git, and Zig-cache
 suite. The bubblewrap tests fail closed if the required namespace boundary is
 unavailable; they are not silently skipped.
 
 Normal resolution starts at this project's `node_modules`. For a reviewed
-local development installation only, `DSH_RC6_NODE_MODULES` may point to a
-different existing `node_modules` directory. The resolver still requires exact
-version `0.1.0-rc.6` and gives an actionable error when absent or mismatched.
-There is no machine-specific fallback path.
+local development installation only, `DSH_NODE_MODULES` may point to a
+different existing `node_modules` directory. The resolver still requires the
+exact version declared by root `devDependencies["@deepseek-ai/dsh"]` (currently
+`0.1.0-rc.7`) and gives an actionable error when absent or mismatched. There is
+no machine-specific fallback path.
 
 To inspect the composition without starting an agent or calling a provider:
 
@@ -99,7 +100,7 @@ To inspect the composition without starting an agent or calling a provider:
 
 The script creates a transient `/tmp/dsh-dsworker-dev.XXXXXX` home, materializes
 only the reviewed profile/preset, validates the composition, and launches the
-rc.6 dump surface with a clean environment. It never writes the user's
+pinned DSH dump surface with a clean environment. It never writes the user's
 persistent `~/.dsh`; the default removes its temporary home.
 
 The explicit worker CLI is documented in
@@ -158,20 +159,20 @@ See [execution-containment.md](docs/execution-containment.md),
 - `@dsh-dsworker/task-contract`: closed parsing, canonical identity, and deep
   immutability for host task authority.
 - `@dsh-dsworker/path-authority`: pure deterministic structured-path policy.
-- `@dsh-dsworker/plugin-path-guard`: rc.6 pre-execution/filesystem binding for
-  structured mutation tools.
+- `@dsh-dsworker/plugin-path-guard`: DSH-bound pre-execution/filesystem binding
+  for structured mutation tools.
 - `@dsh-dsworker/execution-containment`: fail-closed Linux bubblewrap process
   backend shared by Bash and TaskCheck.
 - `@dsh-dsworker/task-check-core`: pure GREEN/RED/ABORTED predicate.
 - `@dsh-dsworker/task-check-local`: bounded snapshots and exact structural
   command executor.
-- `@dsh-dsworker/plugin-task-check`: single-use rc.6 `task_check` adapter and
-  authoritative terminal observation.
+- `@dsh-dsworker/plugin-task-check`: single-use DSH-bound `task_check` adapter
+  and authoritative terminal observation.
 - `@dsh-dsworker/worker-kernel`: one-contract/one-run host lifecycle.
 - `@dsh-dsworker/workspace-delta`: immutable, exact, GREEN-only handoff.
 - `@dsh-dsworker/plugin-request-trace`: zero-model-input request/topology
   observer.
-- `@dsh-dsworker/bundle-core`: lean out-of-tree rc.6 composition overlay.
+- `@dsh-dsworker/bundle-core`: lean out-of-tree DSH composition overlay.
 
 The pinned model-facing geometry is:
 
@@ -211,9 +212,9 @@ backend, retries, and repair generations. They must reuse the same TaskContract
 and deterministic completion spine rather than fork policy.
 
 A minimal public CI workflow is also deferred: reproducing the exact Zig 0.16,
-bubblewrap, namespace, and rc.6 integration boundary in a hosted runner needs a
-separately validated setup. The local provider-free gate is complete and does
-not hide required integration tests.
+bubblewrap, namespace, and pinned-DSH integration boundary in a hosted runner
+needs a separately validated setup. The local provider-free gate is complete
+and does not hide required integration tests.
 
 ## License and provenance
 
