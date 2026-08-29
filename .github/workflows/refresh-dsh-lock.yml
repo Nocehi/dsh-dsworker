@@ -14,6 +14,7 @@ jobs:
   refresh-lockfile:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,10 +27,13 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Pin npm
-        run: npm install --global npm@12.0.1 --ignore-scripts
+        run: npm install --global npm@12.0.1 --ignore-scripts --no-audit --no-fund
 
-      - name: Regenerate lockfile without lifecycle scripts
-        run: npm install --package-lock-only --ignore-scripts
+      - name: Generate clean lockfile without lifecycle scripts
+        shell: bash
+        run: |
+          rm package-lock.json
+          timeout 300s npm install --package-lock-only --ignore-scripts --no-audit --no-fund --timing
 
       - name: Verify coordinated DSH lock closure
         shell: bash
@@ -42,20 +46,22 @@ jobs:
           if (root !== expected) {
             throw new Error(`root lock DSH version ${String(root)} != ${expected}`)
           }
-          const mismatches = []
-          for (const [path, entry] of Object.entries(lock.packages ?? {})) {
-            if (!path.startsWith('node_modules/@deepseek-ai/dsh')) continue
-            if (entry.version !== expected) mismatches.push([path, entry.version])
-          }
+          const dshEntries = Object.entries(lock.packages ?? {}).filter(([path]) =>
+            path.startsWith('node_modules/@deepseek-ai/dsh'),
+          )
+          const mismatches = dshEntries
+            .filter(([, entry]) => entry.version !== expected)
+            .map(([path, entry]) => [path, entry.version])
           if (mismatches.length > 0) {
             throw new Error(`mixed DSH closure: ${JSON.stringify(mismatches)}`)
           }
-          console.log(`verified ${expected} across ${Object.keys(lock.packages ?? {}).filter((path) => path.startsWith('node_modules/@deepseek-ai/dsh')).length} DSH package entries`)
+          if (dshEntries.length === 0) throw new Error('no DSH packages found in regenerated lock')
+          console.log(`verified ${expected} across ${dshEntries.length} DSH package entries`)
           NODE
 
       - uses: actions/upload-artifact@v4
         with:
-          name: package-lock-0.1.1-rc.2
+          name: package-lock-0.1.1-rc.2-clean
           path: package-lock.json
           if-no-files-found: error
 
@@ -65,9 +71,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add package-lock.json
-          if git diff --cached --quiet; then
-            echo 'package-lock.json already current'
-            exit 0
-          fi
           git commit -m 'chore: refresh DSH 0.1.1-rc.2 lockfile'
           git push origin HEAD:${GITHUB_REF_NAME}
