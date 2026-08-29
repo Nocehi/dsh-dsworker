@@ -1,4 +1,4 @@
-name: diagnose-dsh-lock-resolution
+name: diagnose-npm12-peer-resolution
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,47 +23,37 @@ jobs:
         with:
           node-version: '26.4.0'
 
-      - name: Pin npm without registry auth configuration
-        run: npm install --global npm@12.0.1 --ignore-scripts --no-audit --no-fund
-
-      - name: Probe registry metadata
+      - name: Select newest npm 12
         shell: bash
         run: |
-          npm --version
+          echo "bundled_npm=$(npm --version)"
+          npm install --global npm@12 --ignore-scripts --no-audit --no-fund
+          echo "selected_npm=$(npm --version)"
           npm config get registry
-          timeout 30s npm ping
-          timeout 30s npm view @deepseek-ai/dsh@0.1.1-rc.2 version --json
+          npm view @deepseek-ai/dsh@0.1.1-rc.2 version --json
 
-      - name: Probe minimal DSH closure
+      - name: Probe minimal DSH closure with newest npm 12
         id: minimal
         continue-on-error: true
         shell: bash
         run: |
-          mkdir -p /tmp/dsh-minimal
-          cd /tmp/dsh-minimal
+          mkdir -p /tmp/dsh-minimal-new-npm
+          cd /tmp/dsh-minimal-new-npm
           printf '{"name":"dsh-minimal","version":"0.0.0","private":true,"dependencies":{"@deepseek-ai/dsh":"0.1.1-rc.2"}}\n' > package.json
-          timeout 120s npm install --package-lock-only --ignore-scripts --no-audit --no-fund --timing --loglevel=verbose
+          timeout 120s npm install --package-lock-only --ignore-scripts --no-audit --no-fund --timing
 
-      - name: Probe full dsworker closure with normal peer resolution
+      - name: Probe full dsworker closure with newest npm 12
         id: full
         continue-on-error: true
         shell: bash
         run: |
           rm -f package-lock.json
-          timeout 180s npm install --package-lock-only --ignore-scripts --no-audit --no-fund --timing --loglevel=verbose
-
-      - name: Probe full dsworker closure with legacy peer resolution
-        id: legacy
-        continue-on-error: true
-        shell: bash
-        run: |
-          rm -f package-lock.json
-          timeout 120s npm install --package-lock-only --ignore-scripts --no-audit --no-fund --legacy-peer-deps --timing --loglevel=verbose
+          timeout 180s npm install --package-lock-only --ignore-scripts --no-audit --no-fund --timing
 
       - name: Record probe outcomes
         shell: bash
         run: |
           echo "minimal=${{ steps.minimal.outcome }}"
           echo "full=${{ steps.full.outcome }}"
-          echo "legacy=${{ steps.legacy.outcome }}"
           test "${{ steps.minimal.outcome }}" = success
+          test "${{ steps.full.outcome }}" = success
