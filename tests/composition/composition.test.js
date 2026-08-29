@@ -127,7 +127,7 @@ async function assertOrUpdateSnapshot(name, actual) {
   assert.equal(actual, await readFile(path, "utf8"), `snapshot mismatch: ${name}`);
 }
 
-test("headless-dev composes the rc.7 lean preset and trace has zero model geometry", async () => {
+test("headless-dev composes the pinned DSH lean preset and trace has zero model geometry", async () => {
   const temp = await mkdtemp("/tmp/dsh-dsworker-composition.");
   try {
     const on = await collectMode(temp, "on");
@@ -211,10 +211,10 @@ test("headless-dev composes the rc.7 lean preset and trace has zero model geomet
       "@dsh-dsworker/workspace-delta": "file:../workspace-delta",
     });
     assert.deepEqual(workerKernelManifest.peerDependencies, {
-      "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-app-boot": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-llm": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-session": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-agent": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-app-boot": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-llm": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-session": REQUIRED_DSH_VERSION,
     });
     const pathGuardManifest = JSON.parse(
       await readFile(on.runtime.pathGuardResolution, "utf8"),
@@ -226,9 +226,9 @@ test("headless-dev composes the rc.7 lean preset and trace has zero model geomet
     });
     assert.deepEqual(pathGuardManifest.peerDependencies, {
       "@deepseek-ai/cordis": "^4.0.1",
-      "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-fs": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-tools": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-agent": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-fs": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-tools": REQUIRED_DSH_VERSION,
     });
     const pathAuthorityManifest = JSON.parse(
       await readFile(on.runtime.pathAuthorityResolution, "utf8"),
@@ -243,9 +243,9 @@ test("headless-dev composes the rc.7 lean preset and trace has zero model geomet
     });
     assert.deepEqual(taskCheckPluginManifest.peerDependencies, {
       "@deepseek-ai/cordis": "^4.0.1",
-      "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-llm": "0.1.0-rc.7",
-      "@deepseek-ai/dsh-tools": "0.1.0-rc.7",
+      "@deepseek-ai/dsh-agent": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-llm": REQUIRED_DSH_VERSION,
+      "@deepseek-ai/dsh-tools": REQUIRED_DSH_VERSION,
     });
     assert.deepEqual(pathAuthorityManifest.dependencies, {
       "@dsh-dsworker/task-contract": "file:../task-contract",

@@ -22,7 +22,7 @@ async function fakeInstallation(version = REQUIRED_DSH_VERSION) {
 }
 
 test("configured DSH baseline resolves through ordinary project package resolution", async () => {
-  assert.equal(REQUIRED_DSH_VERSION, "0.1.0-rc.7");
+  assert.equal(REQUIRED_DSH_VERSION, "0.1.1-rc.2");
   const root = dshNodeModules();
   const resolved = await assertDshVersion({ root });
   assert.equal(resolved.version, REQUIRED_DSH_VERSION);
@@ -46,14 +46,14 @@ test("missing and mismatched overrides fail with actionable errors", async () =>
   const missing = join("/tmp", "dsh-dsworker-resolution-does-not-exist");
   await assert.rejects(
     assertDshVersion({ override: missing }),
-    /cannot read @deepseek-ai\/dsh 0\.1\.0-rc\.7/u,
+    /cannot read @deepseek-ai\/dsh 0\.1\.1-rc\.2/u,
   );
 
-  const root = await fakeInstallation("0.1.0-rc.6");
+  const root = await fakeInstallation("0.1.0-rc.7");
   try {
     await assert.rejects(
       assertDshVersion({ override: root }),
-      /expected @deepseek-ai\/dsh 0\.1\.0-rc\.7, found 0\.1\.0-rc\.6/u,
+      /expected @deepseek-ai\/dsh 0\.1\.1-rc\.2, found 0\.1\.0-rc\.7/u,
     );
   } finally {
     await rm(root, { recursive: true, force: true });
