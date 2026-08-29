@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 node_bin=$(command -v node)
-rc6_cli=$("$node_bin" "$repo_root/scripts/resolve-rc6-cli.mjs")
+dsh_cli=$("$node_bin" "$repo_root/scripts/resolve-dsh-cli.mjs")
 keep=0
 dump_flag=--dump-config
 
@@ -40,4 +40,4 @@ env -i \
   DSH_HOME="$dev_root" \
   DSH_REQUEST_TRACE_PATH="$dev_root/traces/requests.jsonl" \
   DSH_TELEMETRY_DISABLED=1 \
-  "$node_bin" "$rc6_cli" --profile headless-dev "$dump_flag"
+  "$node_bin" "$dsh_cli" --profile headless-dev "$dump_flag"

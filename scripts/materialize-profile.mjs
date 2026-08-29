@@ -33,7 +33,7 @@ export async function materializeProfile(dshHome) {
     presetDir,
     { recursive: true },
   );
-  const rc6 = await linkProfileModules(profileDir);
+  const dsh = await linkProfileModules(profileDir);
 
   const requireFromProfile = createRequire(join(profileDir, "package.json"));
   const bundleResolution = await realpath(
@@ -91,8 +91,8 @@ export async function materializeProfile(dshHome) {
     dshHome: destination,
     profileDir,
     presetDir,
-    rc6Version: rc6.version,
-    rc6NodeModules: rc6.root,
+    dshVersion: dsh.version,
+    dshNodeModules: dsh.root,
     bundleResolution,
     executionContainmentResolution,
     pluginResolution,
