@@ -28,7 +28,7 @@ The roles are deliberately separate:
 - **dsh-dsworker** is the active deterministic worker harness in this
   repository.
 - **DeepSeek Harness** is the external agent/runtime substrate, pinned here to
-  `@deepseek-ai/dsh@0.1.0-rc.7`.
+  `@deepseek-ai/dsh@0.1.1-rc.2`.
 - **Zigsh** is a production dogfood target. It is not a Bash replacement,
   `ctx.shell` implementation, or subprocess backend in this project.
 
@@ -78,7 +78,7 @@ npm run check
 ```
 
 `npm ci` installs the exact root dependency
-`@deepseek-ai/dsh@0.1.0-rc.7` and its external closure, then links the local npm
+`@deepseek-ai/dsh@0.1.1-rc.2` and its external closure, then links the local npm
 workspaces. `npm run check` runs syntax validation and the complete unit,
 composition, fake-adapter, pinned-DSH lifecycle, containment, Git, and Zig-cache
 suite. The bubblewrap tests fail closed if the required namespace boundary is
@@ -88,7 +88,7 @@ Normal resolution starts at this project's `node_modules`. For a reviewed
 local development installation only, `DSH_NODE_MODULES` may point to a
 different existing `node_modules` directory. The resolver still requires the
 exact version declared by root `devDependencies["@deepseek-ai/dsh"]` (currently
-`0.1.0-rc.7`) and gives an actionable error when absent or mismatched. There is
+`0.1.1-rc.2`) and gives an actionable error when absent or mismatched. There is
 no machine-specific fallback path.
 
 To inspect the composition without starting an agent or calling a provider:
