@@ -1,0 +1,73 @@
+name: refresh-dsh-lock
+
+on:
+  push:
+    branches:
+      - chore/dsh-rc7-baseline
+    paths:
+      - .github/workflows/refresh-dsh-lock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-lockfile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26.4.0'
+          registry-url: https://registry.npmjs.org
+
+      - name: Pin npm
+        run: npm install --global npm@12.0.1 --ignore-scripts
+
+      - name: Regenerate lockfile without lifecycle scripts
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Verify coordinated DSH lock closure
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'))
+          const expected = '0.1.1-rc.2'
+          const root = lock.packages?.['']?.devDependencies?.['@deepseek-ai/dsh']
+          if (root !== expected) {
+            throw new Error(`root lock DSH version ${String(root)} != ${expected}`)
+          }
+          const mismatches = []
+          for (const [path, entry] of Object.entries(lock.packages ?? {})) {
+            if (!path.startsWith('node_modules/@deepseek-ai/dsh')) continue
+            if (entry.version !== expected) mismatches.push([path, entry.version])
+          }
+          if (mismatches.length > 0) {
+            throw new Error(`mixed DSH closure: ${JSON.stringify(mismatches)}`)
+          }
+          console.log(`verified ${expected} across ${Object.keys(lock.packages ?? {}).filter((path) => path.startsWith('node_modules/@deepseek-ai/dsh')).length} DSH package entries`)
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-lock-0.1.1-rc.2
+          path: package-lock.json
+          if-no-files-found: error
+
+      - name: Commit regenerated lockfile
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo 'package-lock.json already current'
+            exit 0
+          fi
+          git commit -m 'chore: refresh DSH 0.1.1-rc.2 lockfile'
+          git push origin HEAD:${GITHUB_REF_NAME}
